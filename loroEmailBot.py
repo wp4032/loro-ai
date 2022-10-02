@@ -2,8 +2,10 @@ from array import array
 import smtplib
 import ssl
 import os
+import openai
 from email.message import EmailMessage
 from dotenv import load_dotenv
+from zoomAPI import Zoom, LoroTranscript, Transcript
 
 env_path = './.env'
 load_dotenv(dotenv_path=env_path)
@@ -20,12 +22,9 @@ class LoroEmailBot:
 
 
   def writeEmail(self, name: str):
-    head = "Dear" + name + ", \n\nThanks for a great meeting with Loro.ai. Here are your personalized notes from the meeting:\n\n"
+    head = "Dear " + name + ", \n\n Thanks for a great meeting with Loro.ai. Here are your personalized notes from the meeting:\n\n"
     body = self.summary
-    end = """\n\n
-    Best,
-    Loro AI Bot :)
-    """
+    end = "\n\nBest,\nLoro AI Bot :)"
     return head + body + end
 
 
@@ -44,20 +43,35 @@ class LoroEmailBot:
       context = ssl.create_default_context()
 
       with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=context) as smtp:
-          smtp.login(self.emailSender, self.emailPassword)
-          smtp.sendmail(self.emailSender, email, em.as_string())
-          print("Sent Email to " + person + "!")
+        smtp.login(self.emailSender, self.emailPassword)
+        smtp.sendmail(self.emailSender, email, em.as_string())
+        print("Sent Email to " + person + "!")
 
 
-# TEST:
+
+# CODE TO SEND EMAILS:
+API_KEY= os.getenv("ZOOM_API_KEY")
+API_SECRET= os.getenv("ZOOM_API_SECRET")
 
 senders = {
   "William": "williampan4032@gmail.com",
-  "Rachel": "rachelloh03@gmail.com"
+  "Andy": "azhu529@gmail.com",
+  "Rachel": "rachelloh03@gmail.com",
 }
-summary = "Test Summary"
-meetingName = "Test Meeting"
-test = LoroEmailBot(recievers=senders, meetingName=meetingName, summary=summary)
-print()
-test.sendEmails()
+
+zoomMIT = Zoom(API_KEY, API_SECRET)
+userId = zoomMIT.getUserID()
+meetingId = zoomMIT.getMeetingID('upcoming', 0)
+recording = zoomMIT.getRecording(id)
+transMIT = Transcript(r'Loro/testTranscript.vtt')
+transMIT.readTranscript()
+Loro1 = LoroTranscript(transMIT, "d")
+Loro1.tokenCount()
+openai.Model.list()
+summary = Loro1.generateFeathers()
+
+meetingName = "HackMIT <> Loro.ai"
+
+email = LoroEmailBot(recievers=senders, meetingName=meetingName, summary=summary)
+email.sendEmails()
 

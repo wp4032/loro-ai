@@ -282,45 +282,25 @@ class Zoom:
         authorized_url = recording_url + "?access_token=" + self.jwt_token_str
         return authorized_url
 
-
         
-        
-# print(API_KEY)
-# print(API_SECRET)
-# zoom = Zoom(API_KEY, API_SECRET)
-# print(zoom.getUserID())
-# id = zoom.getMeetingID('upcoming', 0)
-# print(zoom.getRecording(id))
+zoom = Zoom(API_KEY, API_SECRET)
+userId = zoom.getUserID()
+meetingId = zoom.getMeetingID('upcoming', 0)
+recording = zoom.getRecording(id)
 
 
+# Use this code below if you do not have Zoom Pro for cloud recordings!
+def getTranscriptLocally(folder_path=r"/Path/To/Zoom"):
+    folder_path = r"/Path/To/Zoom"
+    file_type = r'/*vtt'
 
-folder_path = r"/Users/williampan/Documents/ZOOM/*"
-file_type = r'/*vtt'
+    # Finds the latest Zoom Meeting Folder
+    folders = glob.glob(folder_path)
+    latest_folder = max(folders, key=os.path.getctime)
 
-# Finds the latest Zoom Meeting Folder
-folders = glob.glob(folder_path)
-latest_folder = max(folders, key=os.path.getctime)
+    # finds the latest Zoom Meeting Audio
+    transcripts = glob.glob(latest_folder + file_type)
+    latest_transcript = max(transcripts, key=os.path.getctime)
 
-# finds the latest Zoom Meeting Audio
-transcripts = glob.glob(latest_folder + file_type)
-latest_audio = max(transcripts, key=os.path.getctime)
+    return latest_transcript
 
-
-
-
-
-
-
-
-
-
-
-
-# # TESTING
-# trans = Transcript(r'Loro/testTranscript.vtt')
-# trans.readTranscript()
-# Loro1 = Loro(trans, "d")
-# Loro1.tokenCount()
-
-# openai.Model.list()
-# Loro1.generateFeathers()
